@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>pe.edu.utp.ferresys</groupId>
+    <artifactId>ferresys</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>FerreSys</name>
+
+    <!-- ========================================================= -->
+    <!-- PROPIEDADES GENERALES -->
+    <!-- ========================================================= -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <junit.version>5.11.0</junit.version>
+    </properties>
+
+	<!-- ========================================================= -->
+	<!-- DEPENDENCIAS -->
+	<!-- ========================================================= -->
+    <dependencies>
+
+		<!-- JUNIT 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+		    <!-- SQL SERVER JDBC -->
+    <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>12.6.1.jre8</version>
+    </dependency>
+
+		<!-- FLYWAY CORE -->
+	<dependency>
+	    <groupId>org.flywaydb</groupId>
+	    <artifactId>flyway-core</artifactId>
+	    <version>8.5.13</version>
+	</dependency>
+	
+	<!-- FLYWAY SQL SERVER SUPPORT -->
+	<dependency>
+	    <groupId>org.flywaydb</groupId>
+	    <artifactId>flyway-sqlserver</artifactId>
+	    <version>8.5.13</version>
+	</dependency>
+	
+	<!-- BCRYPT PARA HASH DE PASSWORDS -->
+	<dependency>
+	    <groupId>org.mindrot</groupId>
+	    <artifactId>jbcrypt</artifactId>
+	    <version>0.4</version>
+	</dependency>
+
+</dependencies>
+
+	<!-- ========================================================= -->
+	<!-- BUILD -->
+	<!-- ========================================================= -->
+    <build>
+    <plugins>
+
+			<!-- COMPILADOR JAVA -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
+        </plugin>
+
+			<!-- FLYWAY MAVEN PLUGIN -->
+		<plugin>
+		    <groupId>org.flywaydb</groupId>
+		    <artifactId>flyway-maven-plugin</artifactId>
+		    <version>8.5.13</version>
+		    <configuration>
+		        <url>jdbc:sqlserver://localhost:1433;databaseName=FerreSysDB;encrypt=false</url>
+		        <user>ferresys_user</user>
+		        <password>FerreSys123!</password>
+		        <locations>
+		            <location>classpath:db/migration</location>
+		        </locations>
+		    </configuration>
+		</plugin>
+
+    </plugins>
+</build>
+    
+</project>
