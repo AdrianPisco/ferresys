@@ -1,6 +1,7 @@
 package pe.edu.utp.ferresys.service;
 
 import pe.edu.utp.ferresys.dao.UsuarioDAO;
+import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.util.PasswordUtils;
 
@@ -39,19 +40,19 @@ public class UsuarioService {
 		// CASO 1: USUARIO NO EXISTE
 		if (usuario == null) {
 			auditoriaService.registrarEvento(null, "LOGIN_FALLIDO", "Intento con username inexistente: " + username);
-			throw new RuntimeException("Credenciales incorrectas");
+			throw new BusinessException("Credenciales incorrectas");
 		}
 
 		// CASO 2: USUARIO INACTIVO
 		if (!usuario.isEstado()) {
 			auditoriaService.registrarEvento(usuario.getIdUsuario(), "LOGIN_FALLIDO", "Usuario inactivo");
-			throw new RuntimeException("Usuario inactivo");
+			throw new BusinessException("Usuario inactivo");
 		}
 
 		// CASO 3: PASSWORD INCORRECTO
 		if (!PasswordUtils.checkPassword(passwordPlano, usuario.getPasswordHash())) {
 			auditoriaService.registrarEvento(usuario.getIdUsuario(), "LOGIN_FALLIDO", "Password incorrecto");
-			throw new RuntimeException("Credenciales incorrectas");
+			throw new BusinessException("Credenciales incorrectas");
 		}
 
 		// CASO 4: LOGIN EXITOSO
@@ -90,7 +91,7 @@ public class UsuarioService {
 
 	private void validarUsuarioNoExiste(String username) {
 		if (usuarioDAO.findByUsername(username) != null) {
-			throw new RuntimeException("El usuario ya existe");
+			throw new BusinessException("El usuario ya existe");
 		}
 	}
 
