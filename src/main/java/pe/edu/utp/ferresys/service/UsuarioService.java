@@ -66,7 +66,7 @@ public class UsuarioService {
 		validarUsuarioNoExiste(username);
 
 		// 2. GENERAR HASH SEGURO
-		String passwordHash = PasswordUtils.hashPassword(passwordPlano);
+		String passwordHash = generarPasswordHash(passwordPlano);
 
 		// 3. CREAR OBJETO USUARIO
 		Usuario usuario = new Usuario();
@@ -86,5 +86,9 @@ public class UsuarioService {
 			throw new RuntimeException("El usuario ya existe");
 		}
 	}
-	
+
+	private String generarPasswordHash(String passwordPlano) {
+		return PasswordUtils.hashPassword(passwordPlano);
+	}
+
 }
