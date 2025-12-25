@@ -1,7 +1,15 @@
 package pe.edu.utp.ferresys.service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+
+import pe.edu.utp.ferresys.dao.AuditoriaDAO;
 import pe.edu.utp.ferresys.dao.UsuarioDAO;
+import pe.edu.utp.ferresys.db.DatabaseConnection;
 import pe.edu.utp.ferresys.exception.BusinessException;
+import pe.edu.utp.ferresys.exception.TechnicalException;
+import pe.edu.utp.ferresys.model.Auditoria;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.util.PasswordUtils;
 
@@ -22,6 +30,7 @@ public class UsuarioService {
 	// =========================================================
 	private final UsuarioDAO usuarioDAO;
 	private final AuditoriaService auditoriaService = new AuditoriaService();
+	private final AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
 
 	// =========================================================
 	// CONSTRUCTOR
@@ -63,19 +72,40 @@ public class UsuarioService {
 
 	public void createUser(String username, String passwordPlano, int idRole) {
 
-		// 1. VALIDAR QUE NO EXISTA
 		validarUsuarioNoExiste(username);
 
-		// 2. GENERAR HASH SEGURO
-		String passwordHash = generarPasswordHash(passwordPlano);
+		Connection conn = null;
 
-		// 3. CREAR OBJETO USUARIO
-		Usuario usuario = construirUsuarioNuevo(username, passwordHash, idRole);
+		try {
+			conn = DatabaseConnection.getConnection();
+			conn.setAutoCommit(false);
 
-		// 4. GUARDAR EN BD
-		usuarioDAO.create(usuario);
+			String passwordHash = generarPasswordHash(passwordPlano);
+			Usuario usuario = construirUsuarioNuevo(username, passwordHash, idRole);
 
-		auditoriaService.registrarEvento(null, "CREAR_USUARIO", "Usuario creado: " + username);
+			usuarioDAO.create(usuario, conn);
+
+			Auditoria auditoria = new Auditoria();
+			auditoria.setIdUsuario(usuario.getIdUsuario());
+			auditoria.setAccion("CREAR_USUARIO");
+			auditoria.setDetalle("Usuario creado correctamente");
+			auditoria.setFecha(LocalDateTime.now());
+
+			auditoriaDAO.registrar(auditoria, conn);
+
+			conn.commit();
+
+		} catch (BusinessException e) {
+			rollback(conn);
+			throw e;
+
+		} catch (Exception e) {
+			rollback(conn);
+			throw new TechnicalException("Error al crear usuario", e);
+
+		} finally {
+			cerrar(conn);
+		}
 	}
 
 	private Usuario construirUsuarioNuevo(String username, String passwordHash, int idRole) {
@@ -97,6 +127,22 @@ public class UsuarioService {
 
 	private String generarPasswordHash(String passwordPlano) {
 		return PasswordUtils.hashPassword(passwordPlano);
+	}
+
+	private void rollback(Connection conn) {
+		try {
+			if (conn != null)
+				conn.rollback();
+		} catch (SQLException ignored) {
+		}
+	}
+
+	private void cerrar(Connection conn) {
+		try {
+			if (conn != null)
+				conn.close();
+		} catch (SQLException ignored) {
+		}
 	}
 
 }

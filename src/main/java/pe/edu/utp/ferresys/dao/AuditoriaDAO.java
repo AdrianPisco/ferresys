@@ -36,4 +36,20 @@ public class AuditoriaDAO {
 			System.err.println("Error registrando auditoría: " + e.getMessage());
 		}
 	}
+
+	public void registrar(Auditoria auditoria, Connection conn) {
+
+		try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
+
+			stmt.setObject(1, auditoria.getIdUsuario());
+			stmt.setString(2, auditoria.getAccion());
+			stmt.setString(3, auditoria.getDetalle());
+			stmt.setTimestamp(4, Timestamp.valueOf(auditoria.getFecha()));
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new RuntimeException("Error registrando auditoría", e);
+		}
+	}
 }

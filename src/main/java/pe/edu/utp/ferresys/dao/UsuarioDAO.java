@@ -1,6 +1,7 @@
 package pe.edu.utp.ferresys.dao;
 
 import pe.edu.utp.ferresys.db.DatabaseConnection;
+import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Usuario;
 
 import java.sql.Connection;
@@ -71,5 +72,19 @@ public class UsuarioDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException("Error al crear usuario", e);
 		}
+	}
+	
+	public void create(Usuario usuario, Connection conn) {
+	    String sql = "INSERT INTO usuarios (username, password_hash, estado, id_role) VALUES (?, ?, ?, ?)";
+
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setString(1, usuario.getUsername());
+	        ps.setString(2, usuario.getPasswordHash());
+	        ps.setBoolean(3, usuario.isEstado());
+	        ps.setInt(4, usuario.getIdRole());
+	        ps.executeUpdate();
+	    } catch (SQLException e) {
+	        throw new TechnicalException("Error al crear usuario", e);
+	    }
 	}
 }
