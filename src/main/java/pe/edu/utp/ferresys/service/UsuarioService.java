@@ -69,16 +69,23 @@ public class UsuarioService {
 		String passwordHash = generarPasswordHash(passwordPlano);
 
 		// 3. CREAR OBJETO USUARIO
-		Usuario usuario = new Usuario();
-		usuario.setUsername(username);
-		usuario.setPasswordHash(passwordHash);
-		usuario.setEstado(true);
-		usuario.setIdRole(idRole);
+		Usuario usuario = construirUsuarioNuevo(username, passwordHash, idRole);
 
 		// 4. GUARDAR EN BD
 		usuarioDAO.create(usuario);
 
 		auditoriaService.registrarEvento(null, "CREAR_USUARIO", "Usuario creado: " + username);
+	}
+
+	private Usuario construirUsuarioNuevo(String username, String passwordHash, int idRole) {
+		Usuario usuario = new Usuario();
+
+		usuario.setUsername(username);
+		usuario.setPasswordHash(passwordHash);
+		usuario.setEstado(true);
+		usuario.setIdRole(idRole);
+
+		return usuario;
 	}
 
 	private void validarUsuarioNoExiste(String username) {
