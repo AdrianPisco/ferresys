@@ -54,14 +54,14 @@ public class UsuarioDAO {
 			return null;
 
 		} catch (SQLException e) {
-			throw new RuntimeException("Error al buscar usuario por username", e);
+			throw new TechnicalException("Error al buscar usuario por username", e);
 		}
 	}
 
-	public void create(Usuario usuario) {
+	public void create(Usuario usuario, Connection conn) {
 
-		try (Connection conn = DatabaseConnection.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
+		try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, new String[] { "id_usuario" })) {
+
 			stmt.setString(1, usuario.getUsername());
 			stmt.setString(2, usuario.getPasswordHash());
 			stmt.setBoolean(3, usuario.isEstado());
@@ -69,22 +69,13 @@ public class UsuarioDAO {
 
 			stmt.executeUpdate();
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error al crear usuario", e);
-		}
-	}
-	
-	public void create(Usuario usuario, Connection conn) {
-	    String sql = "INSERT INTO usuarios (username, password_hash, estado, id_role) VALUES (?, ?, ?, ?)";
+			ResultSet rs = stmt.getGeneratedKeys();
+			if (rs.next()) {
+				usuario.setIdUsuario(rs.getInt(1));
+			}
 
-	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-	        ps.setString(1, usuario.getUsername());
-	        ps.setString(2, usuario.getPasswordHash());
-	        ps.setBoolean(3, usuario.isEstado());
-	        ps.setInt(4, usuario.getIdRole());
-	        ps.executeUpdate();
-	    } catch (SQLException e) {
-	        throw new TechnicalException("Error al crear usuario", e);
-	    }
+		} catch (SQLException e) {
+			throw new TechnicalException("Error al crear usuario", e);
+		}
 	}
 }

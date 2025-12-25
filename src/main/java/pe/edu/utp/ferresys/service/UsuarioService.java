@@ -1,16 +1,15 @@
 package pe.edu.utp.ferresys.service;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import pe.edu.utp.ferresys.dao.AuditoriaDAO;
 import pe.edu.utp.ferresys.dao.UsuarioDAO;
-import pe.edu.utp.ferresys.db.DatabaseConnection;
 import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Auditoria;
 import pe.edu.utp.ferresys.model.Usuario;
+import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
 import pe.edu.utp.ferresys.util.PasswordUtils;
 
 /*
@@ -23,7 +22,7 @@ import pe.edu.utp.ferresys.util.PasswordUtils;
     - NO CONTIENE UI
 ================================================================================
 */
-public class UsuarioService {
+public class UsuarioService extends ServiceTransaccional {
 
 	// =========================================================
 	// DEPENDENCIA
@@ -74,12 +73,9 @@ public class UsuarioService {
 
 		validarUsuarioNoExiste(username);
 
-		Connection conn = null;
+		Connection conn = abrirTransaccion(); // SE USA LA BASE
 
 		try {
-			conn = DatabaseConnection.getConnection();
-			conn.setAutoCommit(false);
-
 			String passwordHash = generarPasswordHash(passwordPlano);
 			Usuario usuario = construirUsuarioNuevo(username, passwordHash, idRole);
 
@@ -93,10 +89,10 @@ public class UsuarioService {
 
 			auditoriaDAO.registrar(auditoria, conn);
 
-			conn.commit();
+			commit(conn);
 
 		} catch (BusinessException e) {
-			rollback(conn);
+			rollback(conn); // HEREDADO
 			throw e;
 
 		} catch (Exception e) {
@@ -127,22 +123,6 @@ public class UsuarioService {
 
 	private String generarPasswordHash(String passwordPlano) {
 		return PasswordUtils.hashPassword(passwordPlano);
-	}
-
-	private void rollback(Connection conn) {
-		try {
-			if (conn != null)
-				conn.rollback();
-		} catch (SQLException ignored) {
-		}
-	}
-
-	private void cerrar(Connection conn) {
-		try {
-			if (conn != null)
-				conn.close();
-		} catch (SQLException ignored) {
-		}
 	}
 
 }
