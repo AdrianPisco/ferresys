@@ -63,9 +63,7 @@ public class UsuarioService {
 	public void createUser(String username, String passwordPlano, int idRole) {
 
 		// 1. VALIDAR QUE NO EXISTA
-		if (usuarioDAO.findByUsername(username) != null) {
-			throw new RuntimeException("El usuario ya existe");
-		}
+		validarUsuarioNoExiste(username);
 
 		// 2. GENERAR HASH SEGURO
 		String passwordHash = PasswordUtils.hashPassword(passwordPlano);
@@ -82,4 +80,11 @@ public class UsuarioService {
 
 		auditoriaService.registrarEvento(null, "CREAR_USUARIO", "Usuario creado: " + username);
 	}
+
+	private void validarUsuarioNoExiste(String username) {
+		if (usuarioDAO.findByUsername(username) != null) {
+			throw new RuntimeException("El usuario ya existe");
+		}
+	}
+	
 }
