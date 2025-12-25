@@ -6,6 +6,7 @@ public class App {
 
     public static void main(String[] args) {
 
+    	// Punto de entrada principal de la aplicación FerreSys
         UsuarioService service = new UsuarioService();
 
         service.createUser("admin", "Admin123!", 1);
