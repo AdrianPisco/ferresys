@@ -85,4 +85,12 @@ public class ProductoService extends ServiceTransaccional {
 	public List<Producto> listarProductos() {
 	    return productoDAO.listarTodos();
 	}
+	
+	public Producto buscarPorCodigo(String codigo) {
+	    return productoDAO.buscarPorCodigo(codigo);
+	}
+	
+	public List<Producto> buscarPorDescripcion(String texto) {
+	    return productoDAO.buscarPorDescripcion(texto);
+	}
 }

@@ -98,42 +98,117 @@ public class ProductoDAO {
 
 		return p;
 	}
-	
+
 	public List<Producto> listarTodos() {
 
-	    List<Producto> productos = new ArrayList<>();
+		List<Producto> productos = new ArrayList<>();
 
-	    String sql = "SELECT id_producto, codigo, descripcion, categoria, marca, " +
-	                 "unidad_medida, stock_total, precio_compra_soles, " +
-	                 "precio_compra_dolares, precio_venta_soles, estado " +
-	                 "FROM productos";
+		String sql = "SELECT id_producto, codigo, descripcion, categoria, marca, "
+				+ "unidad_medida, stock_total, precio_compra_soles, "
+				+ "precio_compra_dolares, precio_venta_soles, estado " + "FROM productos";
 
-	    try (Connection conn = DatabaseConnection.getConnection();
-	         PreparedStatement ps = conn.prepareStatement(sql);
-	         ResultSet rs = ps.executeQuery()) {
+		try (Connection conn = DatabaseConnection.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
 
-	        while (rs.next()) {
-	            Producto p = new Producto();
+			while (rs.next()) {
+				Producto p = new Producto();
 
-	            p.setIdProducto(rs.getInt("id_producto"));
-	            p.setCodigo(rs.getString("codigo"));
-	            p.setDescripcion(rs.getString("descripcion"));
-	            p.setCategoria(rs.getString("categoria"));
-	            p.setMarca(rs.getString("marca"));
-	            p.setUnidadMedida(rs.getString("unidad_medida"));
-	            p.setStockTotal(rs.getInt("stock_total"));
-	            p.setPrecioCompraSoles(rs.getDouble("precio_compra_soles"));
-	            p.setPrecioCompraDolares(rs.getDouble("precio_compra_dolares"));
-	            p.setPrecioVentaSoles(rs.getDouble("precio_venta_soles"));
-	            p.setEstado(rs.getBoolean("estado"));
+				p.setIdProducto(rs.getInt("id_producto"));
+				p.setCodigo(rs.getString("codigo"));
+				p.setDescripcion(rs.getString("descripcion"));
+				p.setCategoria(rs.getString("categoria"));
+				p.setMarca(rs.getString("marca"));
+				p.setUnidadMedida(rs.getString("unidad_medida"));
+				p.setStockTotal(rs.getInt("stock_total"));
+				p.setPrecioCompraSoles(rs.getDouble("precio_compra_soles"));
+				p.setPrecioCompraDolares(rs.getDouble("precio_compra_dolares"));
+				p.setPrecioVentaSoles(rs.getDouble("precio_venta_soles"));
+				p.setEstado(rs.getBoolean("estado"));
 
-	            productos.add(p);
-	        }
+				productos.add(p);
+			}
 
-	    } catch (SQLException e) {
-	        throw new TechnicalException("Error listando productos", e);
-	    }
+		} catch (SQLException e) {
+			throw new TechnicalException("Error listando productos", e);
+		}
 
-	    return productos;
+		return productos;
 	}
+
+	public Producto buscarPorCodigo(String codigo) {
+
+		String sql = "SELECT id_producto, codigo, descripcion, categoria, marca, "
+				+ "unidad_medida, stock_total, precio_compra_soles, "
+				+ "precio_compra_dolares, precio_venta_soles, estado " + "FROM productos WHERE codigo = ?";
+
+		try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setString(1, codigo);
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				if (rs.next()) {
+					Producto p = new Producto();
+					p.setIdProducto(rs.getInt("id_producto"));
+					p.setCodigo(rs.getString("codigo"));
+					p.setDescripcion(rs.getString("descripcion"));
+					p.setCategoria(rs.getString("categoria"));
+					p.setMarca(rs.getString("marca"));
+					p.setUnidadMedida(rs.getString("unidad_medida"));
+					p.setStockTotal(rs.getInt("stock_total"));
+					p.setPrecioCompraSoles(rs.getDouble("precio_compra_soles"));
+					p.setPrecioCompraDolares(rs.getDouble("precio_compra_dolares"));
+					p.setPrecioVentaSoles(rs.getDouble("precio_venta_soles"));
+					p.setEstado(rs.getBoolean("estado"));
+					return p;
+				}
+			}
+
+			return null;
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error buscando producto por código", e);
+		}
+	}
+
+	public List<Producto> buscarPorDescripcion(String texto) {
+
+		List<Producto> productos = new ArrayList<>();
+
+		String sql = "SELECT id_producto, codigo, descripcion, categoria, marca, "
+				+ "unidad_medida, stock_total, precio_compra_soles, "
+				+ "precio_compra_dolares, precio_venta_soles, estado " + "FROM productos WHERE descripcion LIKE ?";
+
+		try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setString(1, "%" + texto + "%");
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Producto p = new Producto();
+
+					p.setIdProducto(rs.getInt("id_producto"));
+					p.setCodigo(rs.getString("codigo"));
+					p.setDescripcion(rs.getString("descripcion"));
+					p.setCategoria(rs.getString("categoria"));
+					p.setMarca(rs.getString("marca"));
+					p.setUnidadMedida(rs.getString("unidad_medida"));
+					p.setStockTotal(rs.getInt("stock_total"));
+					p.setPrecioCompraSoles(rs.getDouble("precio_compra_soles"));
+					p.setPrecioCompraDolares(rs.getDouble("precio_compra_dolares"));
+					p.setPrecioVentaSoles(rs.getDouble("precio_venta_soles"));
+					p.setEstado(rs.getBoolean("estado"));
+
+					productos.add(p);
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error buscando productos por descripción", e);
+		}
+
+		return productos;
+	}
+
 }
