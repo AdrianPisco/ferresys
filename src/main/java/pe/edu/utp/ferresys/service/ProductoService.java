@@ -2,6 +2,7 @@ package pe.edu.utp.ferresys.service;
 
 import java.sql.Connection;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import pe.edu.utp.ferresys.dao.AuditoriaDAO;
 import pe.edu.utp.ferresys.dao.ProductoDAO;
@@ -79,5 +80,9 @@ public class ProductoService extends ServiceTransaccional {
 		if (p.getPrecioCompraSoles() == null && p.getPrecioCompraDolares() == null) {
 			throw new BusinessException("Debe existir al menos un precio de compra");
 		}
+	}
+	
+	public List<Producto> listarProductos() {
+	    return productoDAO.listarTodos();
 	}
 }
