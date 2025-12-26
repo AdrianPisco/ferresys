@@ -42,7 +42,7 @@ public class ProductoService extends ServiceTransaccional {
 			aud.setDetalle("Producto creado: " + p.getCodigo());
 			aud.setFecha(LocalDateTime.now());
 
-			auditoriaDAO.registrar(aud, conn);
+			//auditoriaDAO.registrar(aud, conn);
 
 			commit(conn);
 
