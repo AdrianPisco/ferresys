@@ -215,13 +215,13 @@ public class ProductoDAO {
 		return productos;
 	}
 
-	public void actualizarStock(String codigo, int nuevoStock, Connection conn) {
+	public void actualizarStock(String codigo, int stockFinal, Connection conn) {
 
 		String sql = "UPDATE productos SET stock_total = ? WHERE codigo = ?";
 
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			ps.setInt(1, nuevoStock);
+			ps.setInt(1, stockFinal);
 			ps.setString(2, codigo);
 
 			int filas = ps.executeUpdate();
