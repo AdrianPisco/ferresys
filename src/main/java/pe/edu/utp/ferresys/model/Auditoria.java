@@ -11,52 +11,44 @@ import java.time.LocalDateTime;
 */
 public class Auditoria {
 
-	private int idAuditoria;
-	private Integer idUsuario;
-	private String accion;
-	private String detalle;
-	private LocalDateTime fecha;
+    private int idAuditoria;
+    private String accion;
+    private String usuario;   // username o identificador textual
+    private LocalDateTime fecha;
 
-	public Auditoria() {
-	}
+    // ============================
+    // GETTERS Y SETTERS
+    // ============================
 
-	public int getIdAuditoria() {
-		return idAuditoria;
-	}
+    public int getIdAuditoria() {
+        return idAuditoria;
+    }
 
-	public void setIdAuditoria(int idAuditoria) {
-		this.idAuditoria = idAuditoria;
-	}
+    public void setIdAuditoria(int idAuditoria) {
+        this.idAuditoria = idAuditoria;
+    }
 
-	public Integer getIdUsuario() {
-		return idUsuario;
-	}
+    public String getAccion() {
+        return accion;
+    }
 
-	public void setIdUsuario(Integer idUsuario) {
-		this.idUsuario = idUsuario;
-	}
+    public void setAccion(String accion) {
+        this.accion = accion;
+    }
 
-	public String getAccion() {
-		return accion;
-	}
+    public String getUsuario() {
+        return usuario;
+    }
 
-	public void setAccion(String accion) {
-		this.accion = accion;
-	}
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
 
-	public String getDetalle() {
-		return detalle;
-	}
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
-	public void setDetalle(String detalle) {
-		this.detalle = detalle;
-	}
-
-	public LocalDateTime getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(LocalDateTime fecha) {
-		this.fecha = fecha;
-	}
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
 }

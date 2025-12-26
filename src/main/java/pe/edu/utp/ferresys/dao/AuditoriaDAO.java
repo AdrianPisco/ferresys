@@ -18,41 +18,44 @@ import java.sql.Timestamp;
 */
 public class AuditoriaDAO {
 
-	private static final String SQL_INSERT = "INSERT INTO auditoria (id_usuario, accion, detalle, fecha) "
-			+ "VALUES (?, ?, ?, ?)";
+    // SQL alineado con la BD REAL
+    private static final String SQL_INSERT =
+        "INSERT INTO auditoria (accion, usuario, fecha) VALUES (?, ?, ?)";
 
-	public void registrar(Auditoria auditoria) {
+    // ============================
+    // REGISTRO SIMPLE
+    // ============================
+    public void registrar(Auditoria auditoria) {
 
-		try (Connection conn = DatabaseConnection.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
-			stmt.setObject(1, auditoria.getIdUsuario());
-			stmt.setString(2, auditoria.getAccion());
-			stmt.setString(3, auditoria.getDetalle());
-			stmt.setTimestamp(4, Timestamp.valueOf(auditoria.getFecha()));
+            stmt.setString(1, auditoria.getAccion());
+            stmt.setString(2, auditoria.getUsuario());
+            stmt.setTimestamp(3, Timestamp.valueOf(auditoria.getFecha()));
 
-			stmt.executeUpdate();
+            stmt.executeUpdate();
 
-		} catch (SQLException e) {
-			// LOGUEAR
-			throw new TechnicalException("Error registrando auditoría (no crítica)", e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new TechnicalException("Error registrando auditoría", e);
+        }
+    }
 
-	// METODO TRANSACCIONAL
-	public void registrar(Auditoria auditoria, Connection conn) {
+    // ============================
+    // REGISTRO TRANSACCIONAL
+    // ============================
+    public void registrar(Auditoria auditoria, Connection conn) {
 
-		try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
+        try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
-			stmt.setObject(1, auditoria.getIdUsuario());
-			stmt.setString(2, auditoria.getAccion());
-			stmt.setString(3, auditoria.getDetalle());
-			stmt.setTimestamp(4, Timestamp.valueOf(auditoria.getFecha()));
+            stmt.setString(1, auditoria.getAccion());
+            stmt.setString(2, auditoria.getUsuario());
+            stmt.setTimestamp(3, Timestamp.valueOf(auditoria.getFecha()));
 
-			stmt.executeUpdate();
+            stmt.executeUpdate();
 
-		} catch (SQLException e) {
-			throw new TechnicalException("Error registrando auditoría", e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new TechnicalException("Error registrando auditoría", e);
+        }
+    }
 }

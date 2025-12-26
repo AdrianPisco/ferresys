@@ -82,9 +82,7 @@ public class UsuarioService extends ServiceTransaccional {
 			usuarioDAO.create(usuario, conn);
 
 			Auditoria auditoria = new Auditoria();
-			auditoria.setIdUsuario(usuario.getIdUsuario());
 			auditoria.setAccion("CREAR_USUARIO");
-			auditoria.setDetalle("Usuario creado correctamente");
 			auditoria.setFecha(LocalDateTime.now());
 
 			auditoriaDAO.registrar(auditoria, conn);

@@ -9,7 +9,7 @@ public class ProductoBuscarDescripcionRunner {
 
         ProductoService service = new ProductoService();
 
-        for (Producto p : service.buscarPorDescripcion("19")) {
+        for (Producto p : service.buscarPorDescripcion("ferre")) {
             System.out.println(
                 p.getCodigo() + " | " +
                 p.getDescripcion() + " | S/ " +

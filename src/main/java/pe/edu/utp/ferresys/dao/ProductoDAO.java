@@ -1,5 +1,6 @@
 package pe.edu.utp.ferresys.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -91,8 +92,11 @@ public class ProductoDAO {
 		p.setMarca(rs.getString("marca"));
 		p.setUnidadMedida(rs.getString("unidad_medida"));
 		p.setStockTotal(rs.getInt("stock_total"));
-		p.setPrecioCompraSoles((Double) rs.getObject("precio_compra_soles"));
-		p.setPrecioCompraDolares((Double) rs.getObject("precio_compra_dolares"));
+		BigDecimal compraSoles = rs.getBigDecimal("precio_compra_soles");
+		BigDecimal compraDolares = rs.getBigDecimal("precio_compra_dolares");
+
+		p.setPrecioCompraSoles(compraSoles != null ? compraSoles.doubleValue() : null);
+		p.setPrecioCompraDolares(compraDolares != null ? compraDolares.doubleValue() : null);
 		p.setPrecioVentaSoles(rs.getDouble("precio_venta_soles"));
 		p.setEstado(rs.getBoolean("estado"));
 
@@ -211,4 +215,89 @@ public class ProductoDAO {
 		return productos;
 	}
 
+	public void actualizarStock(String codigo, int nuevoStock, Connection conn) {
+
+		String sql = "UPDATE productos SET stock_total = ? WHERE codigo = ?";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setInt(1, nuevoStock);
+			ps.setString(2, codigo);
+
+			int filas = ps.executeUpdate();
+
+			if (filas == 0) {
+				throw new TechnicalException("No existe producto con código: " + codigo);
+			}
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error actualizando stock", e);
+		}
+	}
+
+	// BUSCAR POR ID
+	public Producto findById(int idProducto) {
+
+		String sql = "SELECT * FROM productos WHERE id_producto = ?";
+
+		try (Connection conn = DatabaseConnection.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, idProducto);
+
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				return mapear(rs);
+			}
+
+			return null;
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error buscando producto por ID", e);
+		}
+	}
+
+	// UPDATE
+	public void update(Producto p, Connection conn) {
+
+		String sql = "UPDATE productos SET " + "    codigo = ?, " + "    descripcion = ?, " + "    categoria = ?, "
+				+ "    marca = ?, " + "    unidad_medida = ?, " + "    stock_total = ?, "
+				+ "    precio_compra_soles = ?, " + "    precio_compra_dolares = ?, " + "    precio_venta_soles = ? "
+				+ "WHERE id_producto = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, p.getCodigo());
+			stmt.setString(2, p.getDescripcion());
+			stmt.setString(3, p.getCategoria());
+			stmt.setString(4, p.getMarca());
+			stmt.setString(5, p.getUnidadMedida());
+			stmt.setInt(6, p.getStockTotal());
+			stmt.setObject(7, p.getPrecioCompraSoles());
+			stmt.setObject(8, p.getPrecioCompraDolares());
+			stmt.setDouble(9, p.getPrecioVentaSoles());
+			stmt.setInt(10, p.getIdProducto());
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error actualizando producto", e);
+		}
+	}
+
+	// DELETE LOGICO
+	public void deleteLogico(int idProducto, Connection conn) {
+
+		String sql = "UPDATE productos SET estado = 0 WHERE id_producto = ?";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+			ps.setInt(1, idProducto);
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error eliminando producto (lógico)", e);
+		}
+	}
 }

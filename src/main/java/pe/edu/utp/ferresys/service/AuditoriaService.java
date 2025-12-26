@@ -19,9 +19,7 @@ public class AuditoriaService {
 	public void registrarEvento(Integer idUsuario, String accion, String detalle) {
 
 		Auditoria auditoria = new Auditoria();
-		auditoria.setIdUsuario(idUsuario);
 		auditoria.setAccion(accion);
-		auditoria.setDetalle(detalle);
 		auditoria.setFecha(LocalDateTime.now());
 
 		auditoriaDAO.registrar(auditoria);
