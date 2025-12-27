@@ -9,6 +9,15 @@ import pe.edu.utp.ferresys.model.ReporteProductoVendido;
 import pe.edu.utp.ferresys.model.ReporteStock;
 import pe.edu.utp.ferresys.model.ReporteVentaDiaria;
 
+/*
+================================================================================
+ REPORTE DAO
+ RESPONSABILIDAD:
+    - GENERAR REPORTES DE LECTURA (SIN MODIFICAR DATOS)
+    - USO EXCLUSIVO DE CONSULTAS AGREGADAS
+================================================================================
+*/
+
 public class ReporteDAO {
 
 	// =====================================================
@@ -53,7 +62,7 @@ public class ReporteDAO {
 		String sql = "SELECT p.codigo, p.descripcion, " + "       SUM(d.cantidad) AS cantidad_vendida, "
 				+ "       SUM(d.subtotal) AS total_vendido " + "FROM venta_detalle d "
 				+ "JOIN productos p ON p.id_producto = d.id_producto " + "JOIN ventas v ON v.id_venta = d.id_venta "
-				+ "WHERE v.estado = 1 " + "GROUP BY p.codigo, p.descripcion " + "ORDER BY cantidad_vendida DESC";
+				+ "WHERE v.estado = 1 " + "GROUP BY p.codigo, p.descripcion " + "ORDER BY total_vendido DESC";
 
 		try (Connection conn = DatabaseConnection.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql);
@@ -75,12 +84,15 @@ public class ReporteDAO {
 		return lista;
 	}
 
+	// =====================================================
+	// REPORTE: VENTAS DIARIAS
+	// =====================================================
 	public List<ReporteVentaDiaria> obtenerVentasDiarias() {
 
 		List<ReporteVentaDiaria> lista = new ArrayList<>();
 
-		String sql = "SELECT " + "  CAST(fecha AS DATE) AS fecha, " + "  SUM(total) AS total_ventas, "
-				+ "  COUNT(*) AS cantidad_ventas " + "FROM ventas " + "WHERE estado = 1 "
+		String sql = "SELECT CAST(fecha AS DATE) AS fecha, " + "       SUM(total) AS total_ventas, "
+				+ "       COUNT(*) AS cantidad_ventas " + "FROM ventas " + "WHERE estado = 1 "
 				+ "GROUP BY CAST(fecha AS DATE) " + "ORDER BY fecha DESC";
 
 		try (Connection conn = DatabaseConnection.getConnection();
@@ -90,7 +102,7 @@ public class ReporteDAO {
 			while (rs.next()) {
 				ReporteVentaDiaria r = new ReporteVentaDiaria();
 				r.setFecha(rs.getDate("fecha").toLocalDate());
-				r.setTotalVentas(rs.getDouble("total_ventas"));
+				r.setTotalVentas(rs.getBigDecimal("total_ventas"));
 				r.setCantidadVentas(rs.getInt("cantidad_ventas"));
 				lista.add(r);
 			}
@@ -101,5 +113,4 @@ public class ReporteDAO {
 
 		return lista;
 	}
-
 }

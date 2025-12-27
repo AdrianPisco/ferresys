@@ -10,11 +10,12 @@ public class ReporteProductosMasVendidosRunner {
         ReporteService service = new ReporteService();
 
         for (ReporteProductoVendido r : service.productosMasVendidos()) {
-            System.out.println(
-                r.getCodigo() + " | " +
-                r.getDescripcion() + " | Cantidad: " +
-                r.getCantidadVendida() + " | Total S/: " +
-                r.getTotalVendido()
+        	System.out.printf(
+        		    "%s | %s | Cantidad: %d | Total S/: %.2f%n",
+        		    r.getCodigo(),
+        		    r.getDescripcion(),
+        		    r.getCantidadVendida(),
+        		    r.getTotalVendido()
             );
         }
     }

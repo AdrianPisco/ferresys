@@ -1,5 +1,6 @@
 package pe.edu.utp.ferresys.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /*
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 public class ReporteVentaDiaria {
 
 	private LocalDate fecha;
-	private double totalVentas;
+	private BigDecimal totalVentas;
 	private int cantidadVentas;
 
 	public LocalDate getFecha() {
@@ -23,11 +24,11 @@ public class ReporteVentaDiaria {
 		this.fecha = fecha;
 	}
 
-	public double getTotalVentas() {
+	public BigDecimal getTotalVentas() {
 		return totalVentas;
 	}
 
-	public void setTotalVentas(double totalVentas) {
+	public void setTotalVentas(BigDecimal totalVentas) {
 		this.totalVentas = totalVentas;
 	}
 
