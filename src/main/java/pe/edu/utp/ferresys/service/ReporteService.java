@@ -4,6 +4,7 @@ import java.util.List;
 import pe.edu.utp.ferresys.dao.ReporteDAO;
 import pe.edu.utp.ferresys.model.ReporteProductoVendido;
 import pe.edu.utp.ferresys.model.ReporteStock;
+import pe.edu.utp.ferresys.model.ReporteVentaDiaria;
 
 public class ReporteService {
 
@@ -12,8 +13,13 @@ public class ReporteService {
 	public List<ReporteStock> reporteStockActual() {
 		return reporteDAO.obtenerStockActual();
 	}
-	
+
 	public List<ReporteProductoVendido> productosMasVendidos() {
-        return reporteDAO.obtenerProductosMasVendidos();
-    }
+		return reporteDAO.obtenerProductosMasVendidos();
+	}
+
+	public List<ReporteVentaDiaria> reporteVentasDiarias() {
+		return reporteDAO.obtenerVentasDiarias();
+	}
+
 }
