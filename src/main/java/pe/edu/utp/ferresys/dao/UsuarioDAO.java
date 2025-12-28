@@ -2,6 +2,8 @@ package pe.edu.utp.ferresys.dao;
 
 import pe.edu.utp.ferresys.db.DatabaseConnection;
 import pe.edu.utp.ferresys.exception.TechnicalException;
+import pe.edu.utp.ferresys.mapper.RolMapper;
+import pe.edu.utp.ferresys.model.Rol;
 import pe.edu.utp.ferresys.model.Usuario;
 
 import java.sql.Connection;
@@ -15,8 +17,7 @@ import java.sql.SQLException;
  RESPONSABILIDAD:
     - EJECUTAR SQL SOBRE LA TABLA usuarios
     - MAPEAR RESULTADOS A OBJETOS Usuario
-    - NO CONTIENE LOGICA DE NEGOCIO
-    - NO CONTIENE UI
+    - TRADUCIR id_role (BD) ↔ Rol (DOMINIO)
 ================================================================================
 */
 public class UsuarioDAO {
@@ -37,17 +38,22 @@ public class UsuarioDAO {
 
 		try (Connection conn = DatabaseConnection.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(SQL_FIND_BY_USERNAME)) {
-			stmt.setString(1, username);
 
+			stmt.setString(1, username);
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
+
+				int idRole = rs.getInt("id_role");
+				Rol rol = RolMapper.fromId(idRole);
+
 				Usuario usuario = new Usuario();
 				usuario.setIdUsuario(rs.getInt("id_usuario"));
 				usuario.setUsername(rs.getString("username"));
 				usuario.setPasswordHash(rs.getString("password_hash"));
 				usuario.setEstado(rs.getBoolean("estado"));
-				usuario.setIdRole(rs.getInt("id_role"));
+				usuario.setRol(rol);
+
 				return usuario;
 			}
 
@@ -58,6 +64,9 @@ public class UsuarioDAO {
 		}
 	}
 
+	// =========================================================
+	// CREAR USUARIO
+	// =========================================================
 	public void create(Usuario usuario, Connection conn) {
 
 		try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, new String[] { "id_usuario" })) {
@@ -65,7 +74,7 @@ public class UsuarioDAO {
 			stmt.setString(1, usuario.getUsername());
 			stmt.setString(2, usuario.getPasswordHash());
 			stmt.setBoolean(3, usuario.isEstado());
-			stmt.setInt(4, usuario.getIdRole());
+			stmt.setInt(4, RolMapper.toId(usuario.getRol()));
 
 			stmt.executeUpdate();
 

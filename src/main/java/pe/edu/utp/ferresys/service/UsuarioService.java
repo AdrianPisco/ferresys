@@ -8,6 +8,7 @@ import pe.edu.utp.ferresys.dao.UsuarioDAO;
 import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Auditoria;
+import pe.edu.utp.ferresys.model.Rol;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
 import pe.edu.utp.ferresys.util.PasswordUtils;
@@ -24,103 +25,119 @@ import pe.edu.utp.ferresys.util.PasswordUtils;
 */
 public class UsuarioService extends ServiceTransaccional {
 
-	// =========================================================
-	// DEPENDENCIA
-	// =========================================================
-	private final UsuarioDAO usuarioDAO;
-	private final AuditoriaService auditoriaService = new AuditoriaService();
-	private final AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
+    // =========================================================
+    // DEPENDENCIAS
+    // =========================================================
+    private final UsuarioDAO usuarioDAO;
+    private final AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
 
-	// =========================================================
-	// CONSTRUCTOR
-	// =========================================================
-	public UsuarioService() {
-		this.usuarioDAO = new UsuarioDAO();
-	}
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+    public UsuarioService() {
+        this.usuarioDAO = new UsuarioDAO();
+    }
 
-	// =========================================================
-	// LOGIN DE USUARIO
-	// =========================================================
-	public Usuario login(String username, String passwordPlano) {
+    // =========================================================
+    // LOGIN DE USUARIO
+    // =========================================================
+    public Usuario login(String username, String passwordPlano) {
 
-		Usuario usuario = usuarioDAO.findByUsername(username);
+        Usuario usuario = usuarioDAO.findByUsername(username);
 
-		// CASO 1: USUARIO NO EXISTE
-		if (usuario == null) {
-			auditoriaService.registrarEvento(null, "LOGIN_FALLIDO", "Intento con username inexistente: " + username);
-			throw new BusinessException("Credenciales incorrectas");
-		}
+        // CASO 1: USUARIO NO EXISTE
+        if (usuario == null) {
+            registrarAuditoria(username, "LOGIN_FALLIDO");
+            throw new BusinessException("Credenciales incorrectas");
+        }
 
-		// CASO 2: USUARIO INACTIVO
-		if (!usuario.isEstado()) {
-			auditoriaService.registrarEvento(usuario.getIdUsuario(), "LOGIN_FALLIDO", "Usuario inactivo");
-			throw new BusinessException("Usuario inactivo");
-		}
+        // CASO 2: USUARIO INACTIVO
+        if (!usuario.isEstado()) {
+            registrarAuditoria(usuario.getUsername(), "LOGIN_FALLIDO");
+            throw new BusinessException("Usuario inactivo");
+        }
 
-		// CASO 3: PASSWORD INCORRECTO
-		if (!PasswordUtils.checkPassword(passwordPlano, usuario.getPasswordHash())) {
-			auditoriaService.registrarEvento(usuario.getIdUsuario(), "LOGIN_FALLIDO", "Password incorrecto");
-			throw new BusinessException("Credenciales incorrectas");
-		}
+        // CASO 3: PASSWORD INCORRECTO
+        if (!PasswordUtils.checkPassword(passwordPlano, usuario.getPasswordHash())) {
+            registrarAuditoria(usuario.getUsername(), "LOGIN_FALLIDO");
+            throw new BusinessException("Credenciales incorrectas");
+        }
 
-		// CASO 4: LOGIN EXITOSO
-		auditoriaService.registrarEvento(usuario.getIdUsuario(), "LOGIN_EXITOSO", "Login correcto");
+        // CASO 4: LOGIN EXITOSO
+        registrarAuditoria(usuario.getUsername(), "LOGIN_EXITOSO");
 
-		return usuario;
-	}
+        return usuario;
+    }
 
-	public void createUser(String username, String passwordPlano, int idRole) {
+    // =========================================================
+    // CREAR USUARIO
+    // =========================================================
+    public void createUser(String username, String passwordPlano, Rol rol) {
 
-		validarUsuarioNoExiste(username);
+        validarUsuarioNoExiste(username);
 
-		Connection conn = abrirTransaccion(); // SE USA LA BASE
+        Connection conn = abrirTransaccion();
 
-		try {
-			String passwordHash = generarPasswordHash(passwordPlano);
-			Usuario usuario = construirUsuarioNuevo(username, passwordHash, idRole);
+        try {
+            String passwordHash = generarPasswordHash(passwordPlano);
 
-			usuarioDAO.create(usuario, conn);
+            Usuario usuario = construirUsuarioNuevo(username, passwordHash, rol);
 
-			Auditoria auditoria = new Auditoria();
-			auditoria.setAccion("CREAR_USUARIO");
-			auditoria.setFecha(LocalDateTime.now());
+            usuarioDAO.create(usuario, conn);
 
-			auditoriaDAO.registrar(auditoria, conn);
+            Auditoria auditoria = new Auditoria();
+            auditoria.setUsuario(username);
+            auditoria.setAccion("CREAR_USUARIO");
+            auditoria.setFecha(LocalDateTime.now());
 
-			commit(conn);
+            auditoriaDAO.registrar(auditoria, conn);
 
-		} catch (BusinessException e) {
-			rollback(conn); // HEREDADO
-			throw e;
+            commit(conn);
 
-		} catch (Exception e) {
-			rollback(conn);
-			throw new TechnicalException("Error al crear usuario", e);
+        } catch (BusinessException e) {
+            rollback(conn);
+            throw e;
 
-		} finally {
-			cerrar(conn);
-		}
-	}
+        } catch (Exception e) {
+            rollback(conn);
+            throw new TechnicalException("Error al crear usuario", e);
 
-	private Usuario construirUsuarioNuevo(String username, String passwordHash, int idRole) {
-		Usuario usuario = new Usuario();
+        } finally {
+            cerrar(conn);
+        }
+    }
 
-		usuario.setUsername(username);
-		usuario.setPasswordHash(passwordHash);
-		usuario.setEstado(true);
-		usuario.setIdRole(idRole);
+    // =========================================================
+    // METODOS PRIVADOS
+    // =========================================================
+    private Usuario construirUsuarioNuevo(String username, String passwordHash, Rol rol) {
 
-		return usuario;
-	}
+        Usuario usuario = new Usuario();
+        usuario.setUsername(username);
+        usuario.setPasswordHash(passwordHash);
+        usuario.setEstado(true);
+        usuario.setRol(rol);
 
-	private void validarUsuarioNoExiste(String username) {
-		if (usuarioDAO.findByUsername(username) != null) {
-			throw new BusinessException("El usuario ya existe");
-		}
-	}
+        return usuario;
+    }
 
-	private String generarPasswordHash(String passwordPlano) {
-		return PasswordUtils.hashPassword(passwordPlano);
-	}
+    private void validarUsuarioNoExiste(String username) {
+        if (usuarioDAO.findByUsername(username) != null) {
+            throw new BusinessException("El usuario ya existe");
+        }
+    }
 
+    private String generarPasswordHash(String passwordPlano) {
+        return PasswordUtils.hashPassword(passwordPlano);
+    }
+
+    private void registrarAuditoria(String usuario, String accion) {
+
+        Auditoria auditoria = new Auditoria();
+        auditoria.setUsuario(usuario);
+        auditoria.setAccion(accion);
+        auditoria.setFecha(LocalDateTime.now());
+
+        auditoriaDAO.registrar(auditoria);
+    }
 }

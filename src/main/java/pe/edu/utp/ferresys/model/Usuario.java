@@ -11,72 +11,73 @@ package pe.edu.utp.ferresys.model;
 ================================================================================
 */
 public class Usuario {
-	// =========================================================
-	// ATRIBUTOS
-	// =========================================================
-	private int idUsuario;
-	private String username;
-	private String passwordHash;
-	private boolean estado;
-	private int idRole;
 
-	// =========================================================
-	// CONSTRUCTOR VACIO (OBLIGATORIO)
-	// =========================================================
-	public Usuario() {
-	}
+    // =========================================================
+    // ATRIBUTOS
+    // =========================================================
+    private int idUsuario;
+    private String username;
+    private String passwordHash;
+    private boolean estado;
+    private Rol rol;
 
-	// =========================================================
-	// CONSTRUCTOR COMPLETO
-	// =========================================================
-	public Usuario(int idUsuario, String username, String passwordHash, boolean estado, int idRole) {
-		this.idUsuario = idUsuario;
-		this.username = username;
-		this.passwordHash = passwordHash;
-		this.estado = estado;
-		this.idRole = idRole;
-	}
+    // =========================================================
+    // CONSTRUCTOR VACIO (OBLIGATORIO)
+    // =========================================================
+    public Usuario() {
+    }
 
-	// =========================================================
-	// GETTERS Y SETTERS
-	// =========================================================
-	public int getIdUsuario() {
-		return idUsuario;
-	}
+    // =========================================================
+    // CONSTRUCTOR COMPLETO
+    // =========================================================
+    public Usuario(int idUsuario, String username, String passwordHash, boolean estado, Rol rol) {
+        this.idUsuario = idUsuario;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.estado = estado;
+        this.rol = rol;
+    }
 
-	public void setIdUsuario(int idUsuario) {
-		this.idUsuario = idUsuario;
-	}
+    // =========================================================
+    // GETTERS Y SETTERS
+    // =========================================================
+    public int getIdUsuario() {
+        return idUsuario;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getPasswordHash() {
-		return passwordHash;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
-	}
+    public String getPasswordHash() {
+        return passwordHash;
+    }
 
-	public boolean isEstado() {
-		return estado;
-	}
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 
-	public void setEstado(boolean estado) {
-		this.estado = estado;
-	}
+    public boolean isEstado() {
+        return estado;
+    }
 
-	public int getIdRole() {
-		return idRole;
-	}
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
 
-	public void setIdRole(int idRole) {
-		this.idRole = idRole;
-	}
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
 }
