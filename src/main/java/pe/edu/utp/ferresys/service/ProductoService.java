@@ -9,8 +9,10 @@ import pe.edu.utp.ferresys.dao.ProductoDAO;
 import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Auditoria;
+import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Producto;
 import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
+import pe.edu.utp.ferresys.security.SecurityManager;
 
 /*
 ================================================================================
@@ -28,6 +30,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	public void crearProducto(Producto p, int idUsuario) {
 
+		SecurityManager.validar(Permiso.PRODUCTO_CREAR);
 		validarNuevoProducto(p);
 
 		Connection conn = abrirTransaccion();
@@ -59,40 +62,35 @@ public class ProductoService extends ServiceTransaccional {
 	}
 
 	// =========================================================
-	// VALIDACIONES DE NEGOCIO
+	// LISTAR PRODUCTOS
 	// =========================================================
-	private void validarNuevoProducto(Producto p) {
-
-		if (p.getCodigo() == null || p.getCodigo().trim().isEmpty()) {
-			throw new BusinessException("El código del producto es obligatorio");
-		}
-
-		if (productoDAO.findByCodigo(p.getCodigo()) != null) {
-			throw new BusinessException("Ya existe un producto con ese código");
-		}
-
-		if (p.getPrecioVentaSoles() <= 0) {
-			throw new BusinessException("El precio de venta debe ser mayor a cero");
-		}
-
-		if (p.getPrecioCompraSoles() == null && p.getPrecioCompraDolares() == null) {
-			throw new BusinessException("Debe existir al menos un precio de compra");
-		}
-	}
-
 	public List<Producto> listarProductos() {
+		SecurityManager.validar(Permiso.PRODUCTO_VER);
 		return productoDAO.listarTodos();
 	}
 
+	// =========================================================
+	// BUSCAR POR CODIGO
+	// =========================================================
 	public Producto buscarPorCodigo(String codigo) {
+		SecurityManager.validar(Permiso.PRODUCTO_VER);
 		return productoDAO.buscarPorCodigo(codigo);
 	}
 
+	// =========================================================
+	// BUSCAR POR DESCRIPCION
+	// =========================================================
 	public List<Producto> buscarPorDescripcion(String texto) {
+		SecurityManager.validar(Permiso.PRODUCTO_VER);
 		return productoDAO.buscarPorDescripcion(texto);
 	}
 
+	// =========================================================
+	// ACTUALIZAR STOCK
+	// =========================================================
 	public void actualizarStock(String codigo, int nuevoStock, int idUsuario) {
+
+		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
 
 		if (nuevoStock < 0) {
 			throw new BusinessException("El stock no puede ser negativo");
@@ -103,7 +101,6 @@ public class ProductoService extends ServiceTransaccional {
 		try {
 			productoDAO.actualizarStock(codigo, nuevoStock, conn);
 
-			// Auditoría vendrá después (FASE 6)
 			commit(conn);
 
 		} catch (BusinessException e) {
@@ -119,7 +116,12 @@ public class ProductoService extends ServiceTransaccional {
 		}
 	}
 
+	// =========================================================
+	// ACTUALIZAR PRODUCTO
+	// =========================================================
 	public void actualizarProducto(Producto p, int idUsuario) {
+
+		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
 
 		validarActualizacionProducto(p);
 
@@ -140,12 +142,18 @@ public class ProductoService extends ServiceTransaccional {
 		} catch (Exception e) {
 			rollback(conn);
 			throw new TechnicalException("Error actualizando producto", e);
+
 		} finally {
 			cerrar(conn);
 		}
 	}
 
+	// =========================================================
+	// ELIMINAR PRODUCTO
+	// =========================================================
 	public void eliminarProducto(int idProducto, int idUsuario) {
+
+		SecurityManager.validar(Permiso.PRODUCTO_ELIMINAR);
 
 		Producto existente = productoDAO.findById(idProducto);
 
@@ -179,6 +187,11 @@ public class ProductoService extends ServiceTransaccional {
 		}
 	}
 
+	// =========================================================
+	// METODO PRIVADOS
+	// =========================================================
+
+	// VALIDAR ACTUALIZACION DEL PRODUCTO
 	private void validarActualizacionProducto(Producto p) {
 
 		if (p.getIdProducto() <= 0) {
@@ -193,6 +206,25 @@ public class ProductoService extends ServiceTransaccional {
 
 		if (existente != null && existente.getIdProducto() != p.getIdProducto()) {
 			throw new BusinessException("Ya existe otro producto con ese código");
+		}
+
+		if (p.getPrecioVentaSoles() <= 0) {
+			throw new BusinessException("El precio de venta debe ser mayor a cero");
+		}
+
+		if (p.getPrecioCompraSoles() == null && p.getPrecioCompraDolares() == null) {
+			throw new BusinessException("Debe existir al menos un precio de compra");
+		}
+	}
+
+	// VALIDAR NUEVO PRODUCTO
+	private void validarNuevoProducto(Producto p) {
+		if (p.getCodigo() == null || p.getCodigo().trim().isEmpty()) {
+			throw new BusinessException("El código del producto es obligatorio");
+		}
+
+		if (productoDAO.findByCodigo(p.getCodigo()) != null) {
+			throw new BusinessException("Ya existe un producto con ese código");
 		}
 
 		if (p.getPrecioVentaSoles() <= 0) {

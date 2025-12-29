@@ -12,12 +12,6 @@ import pe.edu.utp.ferresys.db.DatabaseConnection;
 import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Producto;
 
-/*
-================================================================================
- PRODUCTO DAO
- DAO PASIVO
-================================================================================
-*/
 public class ProductoDAO {
 
 	private static final String SQL_INSERT = "INSERT INTO productos "
@@ -103,6 +97,9 @@ public class ProductoDAO {
 		return p;
 	}
 
+	// =========================================================
+	// LISTAR TODOS LOS PRODUCTOS
+	// =========================================================
 	public List<Producto> listarTodos() {
 
 		List<Producto> productos = new ArrayList<>();
@@ -140,6 +137,9 @@ public class ProductoDAO {
 		return productos;
 	}
 
+	// =========================================================
+	// BUSCAR POR CODIGO
+	// =========================================================
 	public Producto buscarPorCodigo(String codigo) {
 
 		String sql = "SELECT id_producto, codigo, descripcion, categoria, marca, "
@@ -176,6 +176,9 @@ public class ProductoDAO {
 		}
 	}
 
+	// =========================================================
+	// BUSCAR POR DESCRIPCION
+	// =========================================================
 	public List<Producto> buscarPorDescripcion(String texto) {
 
 		List<Producto> productos = new ArrayList<>();
@@ -215,6 +218,9 @@ public class ProductoDAO {
 		return productos;
 	}
 
+	// =========================================================
+	// ACTUALIZAR STOCK DE PRODUCTOS
+	// =========================================================
 	public void actualizarStock(String codigo, int stockFinal, Connection conn) {
 
 		String sql = "UPDATE productos SET stock_total = ? WHERE codigo = ?";
@@ -235,7 +241,9 @@ public class ProductoDAO {
 		}
 	}
 
+	// =========================================================
 	// BUSCAR POR ID
+	// =========================================================
 	public Producto findById(int idProducto) {
 
 		String sql = "SELECT * FROM productos WHERE id_producto = ?";
@@ -258,7 +266,9 @@ public class ProductoDAO {
 		}
 	}
 
-	// UPDATE
+	// =========================================================
+	// ACTUALIZACION DE PRODUCTO
+	// =========================================================
 	public void update(Producto p, Connection conn) {
 
 		String sql = "UPDATE productos SET " + "    codigo = ?, " + "    descripcion = ?, " + "    categoria = ?, "
@@ -286,7 +296,9 @@ public class ProductoDAO {
 		}
 	}
 
-	// DELETE LOGICO
+	// =========================================================
+	// ELIMINACION LOGICO DE PRODUCTOS
+	// =========================================================
 	public void deleteLogico(int idProducto, Connection conn) {
 
 		String sql = "UPDATE productos SET estado = 0 WHERE id_producto = ?";
