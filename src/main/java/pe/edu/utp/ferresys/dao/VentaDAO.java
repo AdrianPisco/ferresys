@@ -18,9 +18,6 @@ import java.time.LocalDateTime;
 */
 public class VentaDAO {
 
-	// =========================================================
-	// SQL
-	// =========================================================
 	private static final String SQL_INSERT_VENTA = "INSERT INTO ventas (fecha, id_usuario, total, estado) VALUES (?, ?, ?, ?)";
 
 	private static final String SQL_INSERT_DETALLE = "INSERT INTO venta_detalle (id_venta, id_producto, cantidad, precio_unitario, subtotal) "

@@ -4,10 +4,12 @@ import pe.edu.utp.ferresys.dao.ProductoDAO;
 import pe.edu.utp.ferresys.dao.VentaDAO;
 import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.exception.TechnicalException;
+import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Producto;
 import pe.edu.utp.ferresys.model.Venta;
 import pe.edu.utp.ferresys.model.VentaDetalle;
 import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
+import pe.edu.utp.ferresys.security.SecurityManager;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -34,6 +36,8 @@ public class VentaService extends ServiceTransaccional {
 	// =========================================================
 	public void registrarVenta(Venta venta) {
 
+		SecurityManager.validar(Permiso.VENTA_CREAR);
+
 		if (venta == null || venta.getDetalles() == null || venta.getDetalles().isEmpty()) {
 			throw new BusinessException("La venta no tiene detalles");
 		}
@@ -45,9 +49,7 @@ public class VentaService extends ServiceTransaccional {
 			venta.setFecha(LocalDateTime.now());
 			venta.setEstado(true);
 
-			// =========================
 			// VALIDAR DETALLES
-			// =========================
 			for (VentaDetalle d : venta.getDetalles()) {
 
 				if (d.getCantidad() <= 0) {
@@ -71,32 +73,24 @@ public class VentaService extends ServiceTransaccional {
 				d.recalcularSubtotal();
 			}
 
-			// =========================
 			// TOTAL DE LA VENTA
-			// =========================
 			venta.recalcularTotal();
 
-			// =========================
 			// INSERTAR CABECERA
-			// =========================
 			int idVenta = ventaDAO.insertarVenta(venta, conn);
 
-			// =========================
 			// INSERTAR DETALLES + KARDEX
-			// =========================
 			for (VentaDetalle d : venta.getDetalles()) {
 
 				// DETALLE
 				ventaDAO.insertarDetalle(d, idVenta, conn);
 
-				// KARDEX (ESTE MÉTODO YA ACTUALIZA STOCK)
+				// KARDEX
 				kardexService.registrarMovimiento(d.getIdProducto(), "SALIDA", d.getCantidad(), "Venta #" + idVenta,
 						"sistema", conn);
 			}
 
-			// =========================
 			// COMMIT FINAL
-			// =========================
 			commit(conn);
 
 		} catch (BusinessException e) {
