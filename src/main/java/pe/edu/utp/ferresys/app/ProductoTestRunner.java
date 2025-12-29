@@ -1,15 +1,26 @@
 package pe.edu.utp.ferresys.app;
 
 import pe.edu.utp.ferresys.model.Producto;
+import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.service.ProductoService;
+import pe.edu.utp.ferresys.service.UsuarioService;
+import pe.edu.utp.ferresys.session.UserSession;
 
 public class ProductoTestRunner {
 
 	public static void main(String[] args) {
 
-		ProductoService productoService = new ProductoService();
+		// ==========================================
+		// LOGIN Y SESION (ADMIN)
+		// ==========================================
+		UsuarioService usuarioService = new UsuarioService();
+		Usuario admin = usuarioService.login("admin", "admin123");
+		UserSession.setUsuarioActual(admin);
 
-		int idUsuario = 1; // ADMIN EXISTENTE
+		// ==========================================
+		// CARGA DE PRODUCTOS
+		// ==========================================
+		ProductoService productoService = new ProductoService();
 
 		for (int i = 1; i <= 20; i++) {
 
@@ -30,11 +41,16 @@ public class ProductoTestRunner {
 
 			p.setEstado(true);
 
-			productoService.crearProducto(p, idUsuario);
+			productoService.crearProducto(p);
 
 			System.out.println("Producto insertado: " + p.getCodigo());
 		}
 
 		System.out.println("Carga de productos de prueba finalizada");
+
+		// ==========================================
+		// CIERRE DE SESION
+		// ==========================================
+		UserSession.cerrarSesion();
 	}
 }

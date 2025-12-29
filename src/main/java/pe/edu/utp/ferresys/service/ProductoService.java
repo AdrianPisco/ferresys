@@ -11,8 +11,10 @@ import pe.edu.utp.ferresys.exception.TechnicalException;
 import pe.edu.utp.ferresys.model.Auditoria;
 import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Producto;
-import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
+import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.security.SecurityManager;
+import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
+import pe.edu.utp.ferresys.session.UserSession;
 
 /*
 ================================================================================
@@ -28,7 +30,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	// CREAR PRODUCTO
 	// =========================================================
-	public void crearProducto(Producto p, int idUsuario) {
+	public void crearProducto(Producto p) {
 
 		SecurityManager.validar(Permiso.PRODUCTO_CREAR);
 		validarNuevoProducto(p);
@@ -40,11 +42,7 @@ public class ProductoService extends ServiceTransaccional {
 
 			productoDAO.create(p, conn);
 
-			Auditoria aud = new Auditoria();
-			aud.setAccion("CREAR_PRODUCTO");
-			aud.setFecha(LocalDateTime.now());
-
-			auditoriaDAO.registrar(aud, conn);
+			registrarAuditoria("CREAR_PRODUCTO");
 
 			commit(conn);
 
@@ -88,7 +86,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	// ACTUALIZAR STOCK
 	// =========================================================
-	public void actualizarStock(String codigo, int nuevoStock, int idUsuario) {
+	public void actualizarStock(String codigo, int nuevoStock) {
 
 		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
 
@@ -119,7 +117,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	// ACTUALIZAR PRODUCTO
 	// =========================================================
-	public void actualizarProducto(Producto p, int idUsuario) {
+	public void actualizarProducto(Producto p) {
 
 		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
 
@@ -130,12 +128,7 @@ public class ProductoService extends ServiceTransaccional {
 		try {
 			productoDAO.update(p, conn);
 
-			Auditoria aud = new Auditoria();
-			aud.setAccion("ACTUALIZAR_PRODUCTO");
-			aud.setUsuario("admin"); // USUARIO TECNICO TEMPORAL
-			aud.setFecha(LocalDateTime.now());
-
-			auditoriaDAO.registrar(aud, conn);
+			registrarAuditoria("ACTUALIZAR_PRODUCTO");
 
 			commit(conn);
 
@@ -151,7 +144,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	// ELIMINAR PRODUCTO
 	// =========================================================
-	public void eliminarProducto(int idProducto, int idUsuario) {
+	public void eliminarProducto(int idProducto) {
 
 		SecurityManager.validar(Permiso.PRODUCTO_ELIMINAR);
 
@@ -170,12 +163,7 @@ public class ProductoService extends ServiceTransaccional {
 		try {
 			productoDAO.deleteLogico(idProducto, conn);
 
-			Auditoria aud = new Auditoria();
-			aud.setAccion("ELIMINAR_PRODUCTO");
-			aud.setUsuario("admin"); // USUARIO TECNICO
-			aud.setFecha(LocalDateTime.now());
-
-			auditoriaDAO.registrar(aud, conn);
+			registrarAuditoria("ELIMINAR_PRODUCTO");
 
 			commit(conn);
 
@@ -234,5 +222,18 @@ public class ProductoService extends ServiceTransaccional {
 		if (p.getPrecioCompraSoles() == null && p.getPrecioCompraDolares() == null) {
 			throw new BusinessException("Debe existir al menos un precio de compra");
 		}
+	}
+
+	// AUDITORIA CON USUARIO DE SESION
+	private void registrarAuditoria(String accion) {
+
+		Usuario usuarioSesion = UserSession.getUsuarioActual();
+
+		Auditoria auditoria = new Auditoria();
+		auditoria.setUsuario(usuarioSesion != null ? usuarioSesion.getUsername() : "SIN_SESION");
+		auditoria.setAccion(accion);
+		auditoria.setFecha(LocalDateTime.now());
+
+		auditoriaDAO.registrar(auditoria);
 	}
 }
