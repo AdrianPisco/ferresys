@@ -14,6 +14,7 @@ import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
 import pe.edu.utp.ferresys.util.PasswordUtils;
 import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.security.SecurityManager;
+import pe.edu.utp.ferresys.session.UserSession;
 
 /*
 ================================================================================
@@ -66,6 +67,8 @@ public class UsuarioService extends ServiceTransaccional {
 		}
 
 		// CASO 4: LOGIN EXITOSO
+		UserSession.setUsuarioActual(usuario);
+
 		registrarAuditoria(usuario.getUsername(), "LOGIN_EXITOSO");
 
 		return usuario;
