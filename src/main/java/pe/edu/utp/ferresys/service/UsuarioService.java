@@ -28,15 +28,11 @@ import pe.edu.utp.ferresys.session.UserSession;
 */
 public class UsuarioService extends ServiceTransaccional {
 
-	// =========================================================
 	// DEPENDENCIAS
-	// =========================================================
 	private final UsuarioDAO usuarioDAO;
 	private final AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
 
-	// =========================================================
 	// CONSTRUCTOR
-	// =========================================================
 	public UsuarioService() {
 		this.usuarioDAO = new UsuarioDAO();
 	}
@@ -50,32 +46,32 @@ public class UsuarioService extends ServiceTransaccional {
 
 		// CASO 1: USUARIO NO EXISTE
 		if (usuario == null) {
-			registrarAuditoria(username, "LOGIN_FALLIDO");
+			registrarAuditoria("LOGIN_FALLIDO");
 			throw new BusinessException("Credenciales incorrectas");
 		}
 
 		// CASO 2: USUARIO INACTIVO
 		if (!usuario.isEstado()) {
-			registrarAuditoria(usuario.getUsername(), "LOGIN_FALLIDO");
+			registrarAuditoria("LOGIN_FALLIDO");
 			throw new BusinessException("Usuario inactivo");
 		}
 
 		// CASO 3: PASSWORD INCORRECTO
 		if (!PasswordUtils.checkPassword(passwordPlano, usuario.getPasswordHash())) {
-			registrarAuditoria(usuario.getUsername(), "LOGIN_FALLIDO");
+			registrarAuditoria("LOGIN_FALLIDO");
 			throw new BusinessException("Credenciales incorrectas");
 		}
 
 		// CASO 4: LOGIN EXITOSO
 		UserSession.setUsuarioActual(usuario);
 
-		registrarAuditoria(usuario.getUsername(), "LOGIN_EXITOSO");
+		registrarAuditoria("LOGIN_EXITOSO");
 
 		return usuario;
 	}
 
 	// =========================================================
-	// CREAR USUARIO
+	// CREACION DE USUARIO
 	// =========================================================
 	public void createUser(String username, String passwordPlano, Rol rol) {
 
@@ -115,9 +111,6 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public Usuario getUsuarioPorUsername(String username) {
 
-		// =====================================================
-		// VALIDACION DE PERMISOS
-		// =====================================================
 		SecurityManager.validar(Permiso.USUARIO_VER);
 
 		Usuario usuario = usuarioDAO.findByUsername(username);
@@ -131,9 +124,6 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public void desactivarUsuario(String username) {
 
-		// =====================================================
-		// VALIDACION DE PERMISOS
-		// =====================================================
 		SecurityManager.validar(Permiso.USUARIO_EDITAR);
 
 		Connection conn = abrirTransaccion();
@@ -167,9 +157,6 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public void eliminarUsuario(String username) {
 
-		// =====================================================
-		// VALIDACION DE PERMISOS
-		// =====================================================
 		SecurityManager.validar(Permiso.USUARIO_ELIMINAR);
 
 		Connection conn = abrirTransaccion();
@@ -218,13 +205,16 @@ public class UsuarioService extends ServiceTransaccional {
 		return PasswordUtils.hashPassword(passwordPlano);
 	}
 
-	private void registrarAuditoria(String usuario, String accion) {
+	private void registrarAuditoria(String accion) {
+
+		Usuario usuarioSesion = UserSession.getUsuarioActual();
 
 		Auditoria auditoria = new Auditoria();
-		auditoria.setUsuario(usuario);
+		auditoria.setUsuario(usuarioSesion != null ? usuarioSesion.getUsername() : "SIN_SESION");
 		auditoria.setAccion(accion);
 		auditoria.setFecha(LocalDateTime.now());
 
 		auditoriaDAO.registrar(auditoria);
 	}
+
 }
