@@ -31,6 +31,10 @@ public class UsuarioDAO {
 	private static final String SQL_INSERT = "INSERT INTO usuarios (username, password_hash, estado, id_role) "
 			+ "VALUES (?, ?, ?, ?)";
 
+	private static final String SQL_UPDATE_ESTADO = "UPDATE usuarios SET estado = ? WHERE username = ?";
+
+	private static final String SQL_DELETE_BY_USERNAME = "DELETE FROM usuarios WHERE username = ?";
+
 	// =========================================================
 	// BUSCAR USUARIO POR USERNAME
 	// =========================================================
@@ -85,6 +89,38 @@ public class UsuarioDAO {
 
 		} catch (SQLException e) {
 			throw new TechnicalException("Error al crear usuario", e);
+		}
+	}
+
+	// =========================================================
+	// ACTUALIZAR ESTADO DE USUARIO (ACTIVO / INACTIVO)
+	// =========================================================
+	public void updateEstado(Usuario usuario, Connection conn) {
+
+		try (PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_ESTADO)) {
+
+			stmt.setBoolean(1, usuario.isEstado());
+			stmt.setString(2, usuario.getUsername());
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error al actualizar estado del usuario", e);
+		}
+	}
+
+	// =========================================================
+	// ELIMINAR USUARIO POR USERNAME
+	// =========================================================
+	public void deleteByUsername(String username, Connection conn) {
+
+		try (PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_BY_USERNAME)) {
+
+			stmt.setString(1, username);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new TechnicalException("Error al eliminar usuario", e);
 		}
 	}
 }
