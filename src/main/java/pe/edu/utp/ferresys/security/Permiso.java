@@ -1,4 +1,4 @@
-package pe.edu.utp.ferresys.model;
+package pe.edu.utp.ferresys.security;
 
 /*
 =========================================================

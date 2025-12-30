@@ -3,10 +3,10 @@ package pe.edu.utp.ferresys.service;
 import java.util.List;
 
 import pe.edu.utp.ferresys.dao.ReporteDAO;
-import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.ReporteProductoVendido;
 import pe.edu.utp.ferresys.model.ReporteStock;
 import pe.edu.utp.ferresys.model.ReporteVentaDiaria;
+import pe.edu.utp.ferresys.security.Permiso;
 import pe.edu.utp.ferresys.security.SecurityManager;
 
 /*

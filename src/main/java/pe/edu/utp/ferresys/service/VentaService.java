@@ -4,11 +4,11 @@ import pe.edu.utp.ferresys.dao.ProductoDAO;
 import pe.edu.utp.ferresys.dao.VentaDAO;
 import pe.edu.utp.ferresys.exception.BusinessException;
 import pe.edu.utp.ferresys.exception.TechnicalException;
-import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Producto;
 import pe.edu.utp.ferresys.model.Venta;
 import pe.edu.utp.ferresys.model.VentaDetalle;
 import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
+import pe.edu.utp.ferresys.security.Permiso;
 import pe.edu.utp.ferresys.security.SecurityManager;
 
 import java.math.BigDecimal;

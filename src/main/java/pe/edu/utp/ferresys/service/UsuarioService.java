@@ -12,7 +12,7 @@ import pe.edu.utp.ferresys.model.Rol;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.service.base.ServiceTransaccional;
 import pe.edu.utp.ferresys.util.PasswordUtils;
-import pe.edu.utp.ferresys.model.Permiso;
+import pe.edu.utp.ferresys.security.Permiso;
 import pe.edu.utp.ferresys.security.SecurityManager;
 import pe.edu.utp.ferresys.session.UserSession;
 

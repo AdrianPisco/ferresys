@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Rol;
 
 /*

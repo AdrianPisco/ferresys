@@ -1,7 +1,6 @@
 package pe.edu.utp.ferresys.security;
 
 import pe.edu.utp.ferresys.exception.BusinessException;
-import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.session.UserSession;
 
