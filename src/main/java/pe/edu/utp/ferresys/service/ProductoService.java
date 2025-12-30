@@ -36,7 +36,7 @@ public class ProductoService extends ServiceTransaccional {
 		validarNuevoProducto(p);
 
 		Connection conn = abrirTransaccion();
-
+		
 		try {
 			p.setEstado(true);
 
