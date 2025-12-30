@@ -5,53 +5,46 @@ import pe.edu.utp.ferresys.model.Permiso;
 import pe.edu.utp.ferresys.model.Usuario;
 import pe.edu.utp.ferresys.session.UserSession;
 
-/*
-================================================================================
- SECURITY MANAGER
- RESPONSABILIDAD:
-    - VALIDAR PERMISOS DEL USUARIO EN SESION
-    - CENTRALIZAR EL CONTROL DE ACCESO
-    - EVITAR LOGICA DE SEGURIDAD DISTRIBUIDA
-================================================================================
-*/
 public final class SecurityManager {
 
-    // =========================================================
-    // CONSTRUCTOR PRIVADO
-    // =========================================================
-    private SecurityManager() {
-        // EVITA INSTANCIACION
-    }
+	private SecurityManager() {
+	}
 
-    // =========================================================
-    // CONSULTA: ¿TIENE PERMISO?
-    // =========================================================
-    public static boolean tienePermiso(Permiso permiso) {
+	// =========================================================
+	// VALIDAR SESION ACTIVA
+	// =========================================================
+	public static void validarSesionActiva() {
 
-        Usuario usuario = UserSession.getUsuarioActual();
+		if (!UserSession.isLoggedIn()) {
+			throw new BusinessException("ACCESO DENEGADO: NO EXISTE UNA SESION ACTIVA");
+		}
+	}
 
-        if (usuario == null) {
-            return false;
-        }
+	// =========================================================
+	// CONSULTA: ¿TIENE PERMISO?
+	// =========================================================
+	public static boolean tienePermiso(Permiso permiso) {
 
-        if (usuario.getRol() == null) {
-            return false;
-        }
+		validarSesionActiva();
 
-        return RolPermisoConfig
-                .permisosDe(usuario.getRol())
-                .contains(permiso);
-    }
+		Usuario usuario = UserSession.getUsuarioActual();
 
-    // =========================================================
-    // VALIDACION: BLOQUEA SI NO TIENE PERMISO
-    // =========================================================
-    public static void validar(Permiso permiso) {
+		if (usuario.getRol() == null) {
+			return false;
+		}
 
-        if (!tienePermiso(permiso)) {
-            throw new BusinessException(
-                "NO TIENE PERMISOS PARA REALIZAR ESTA OPERACION"
-            );
-        }
-    }
+		return RolPermisoConfig.permisosDe(usuario.getRol()).contains(permiso);
+	}
+
+	// =========================================================
+	// VALIDACION: BLOQUEA SI NO TIENE PERMISO
+	// =========================================================
+	public static void validar(Permiso permiso) {
+
+		validarSesionActiva();
+
+		if (!tienePermiso(permiso)) {
+			throw new BusinessException("NO TIENE PERMISOS PARA REALIZAR ESTA OPERACION");
+		}
+	}
 }

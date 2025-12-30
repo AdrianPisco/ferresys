@@ -50,7 +50,7 @@ public final class UserSession {
 	// =========================================================
 	// VERIFICA SI HAY SESION ACTIVA
 	// =========================================================
-	public static boolean haySesionActiva() {
+	public static boolean isLoggedIn() {
 		return usuarioActual != null;
 	}
 }
