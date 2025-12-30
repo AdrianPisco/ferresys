@@ -47,4 +47,16 @@ public final class SecurityManager {
 			throw new BusinessException("NO TIENE PERMISOS PARA REALIZAR ESTA OPERACION");
 		}
 	}
+
+	// =========================================================
+	// LOGOUT: CIERRE OFICIAL DE SESION
+	// =========================================================
+	public static void logout() {
+
+		if (!UserSession.isLoggedIn()) {
+			return;
+		}
+
+		UserSession.reset();
+	}
 }

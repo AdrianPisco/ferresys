@@ -6,10 +6,11 @@ import pe.edu.utp.ferresys.model.Usuario;
 ================================================================================
  USER SESSION
  RESPONSABILIDAD:
-    - MANTENER EN MEMORIA AL USUARIO ACTUAL DEL SISTEMA
-    - SERVIR COMO CONTEXTO PARA SEGURIDAD (ROLES Y PERMISOS)
+    - MANTENER EN MEMORIA EL CONTEXTO DE SESION DEL USUARIO
+    - SERVIR COMO FUENTE UNICA DE VERDAD PARA SEGURIDAD
     - NO CONTIENE UI
     - NO CONTIENE LOGICA DE NEGOCIO
+    - NO VALIDA PERMISOS (ESO ES TAREA DEL SECURITY MANAGER)
 ================================================================================
 */
 public final class UserSession {
@@ -41,10 +42,20 @@ public final class UserSession {
 	}
 
 	// =========================================================
-	// CIERRA LA SESION ACTUAL
+	// RESETEA COMPLETAMENTE LA SESION
+	// USO EXCLUSIVO DEL SECURITY MANAGER
 	// =========================================================
-	public static void cerrarSesion() {
+	public static void reset() {
 		usuarioActual = null;
+	}
+
+	// =========================================================
+	// METODO LEGACY
+	// SE MANTIENE PARA COMPATIBILIDAD
+	// =========================================================
+	@Deprecated
+	public static void cerrarSesion() {
+		reset();
 	}
 
 	// =========================================================
