@@ -26,7 +26,7 @@ public class ReporteService {
 	// =====================================================
 	public List<ReporteStock> reporteStockActual() {
 
-		SecurityManager.validar(Permiso.REPORTE_VER);
+		SecurityManager.validarPermiso(Permiso.REPORTE_VER);
 
 		return reporteDAO.obtenerStockActual();
 	}
@@ -36,7 +36,7 @@ public class ReporteService {
 	// =====================================================
 	public List<ReporteProductoVendido> productosMasVendidos() {
 
-		SecurityManager.validar(Permiso.REPORTE_VER);
+		SecurityManager.validarPermiso(Permiso.REPORTE_VER);
 
 		return reporteDAO.obtenerProductosMasVendidos();
 	}
@@ -46,7 +46,7 @@ public class ReporteService {
 	// =====================================================
 	public List<ReporteVentaDiaria> reporteVentasDiarias() {
 
-		SecurityManager.validar(Permiso.REPORTE_VER);
+		SecurityManager.validarPermiso(Permiso.REPORTE_VER);
 
 		return reporteDAO.obtenerVentasDiarias();
 	}

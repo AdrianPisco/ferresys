@@ -25,11 +25,9 @@ public final class SecurityManager {
 	// =========================================================
 	public static boolean tienePermiso(Permiso permiso) {
 
-		validarSesionActiva();
-
 		Usuario usuario = UserSession.getUsuarioActual();
 
-		if (usuario.getRol() == null) {
+		if (usuario == null || usuario.getRol() == null) {
 			return false;
 		}
 
@@ -39,12 +37,12 @@ public final class SecurityManager {
 	// =========================================================
 	// VALIDACION: BLOQUEA SI NO TIENE PERMISO
 	// =========================================================
-	public static void validar(Permiso permiso) {
+	public static void validarPermiso(Permiso permiso) {
 
 		validarSesionActiva();
 
 		if (!tienePermiso(permiso)) {
-			throw new BusinessException("NO TIENE PERMISOS PARA REALIZAR ESTA OPERACION");
+			throw new BusinessException("ACCESO DENEGADO: FALTA PERMISO " + permiso);
 		}
 	}
 

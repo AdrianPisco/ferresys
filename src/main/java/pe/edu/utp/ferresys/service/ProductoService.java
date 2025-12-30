@@ -32,7 +32,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	public void crearProducto(Producto p) {
 
-		SecurityManager.validar(Permiso.PRODUCTO_CREAR);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_CREAR);
 		validarNuevoProducto(p);
 
 		Connection conn = abrirTransaccion();
@@ -63,7 +63,7 @@ public class ProductoService extends ServiceTransaccional {
 	// LISTAR PRODUCTOS
 	// =========================================================
 	public List<Producto> listarProductos() {
-		SecurityManager.validar(Permiso.PRODUCTO_VER);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_VER);
 		return productoDAO.listarTodos();
 	}
 
@@ -71,7 +71,7 @@ public class ProductoService extends ServiceTransaccional {
 	// BUSCAR POR CODIGO
 	// =========================================================
 	public Producto buscarPorCodigo(String codigo) {
-		SecurityManager.validar(Permiso.PRODUCTO_VER);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_VER);
 		return productoDAO.buscarPorCodigo(codigo);
 	}
 
@@ -79,7 +79,7 @@ public class ProductoService extends ServiceTransaccional {
 	// BUSCAR POR DESCRIPCION
 	// =========================================================
 	public List<Producto> buscarPorDescripcion(String texto) {
-		SecurityManager.validar(Permiso.PRODUCTO_VER);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_VER);
 		return productoDAO.buscarPorDescripcion(texto);
 	}
 
@@ -88,7 +88,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	public void actualizarStock(String codigo, int nuevoStock) {
 
-		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_EDITAR);
 
 		if (nuevoStock < 0) {
 			throw new BusinessException("El stock no puede ser negativo");
@@ -119,7 +119,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	public void actualizarProducto(Producto p) {
 
-		SecurityManager.validar(Permiso.PRODUCTO_EDITAR);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_EDITAR);
 
 		validarActualizacionProducto(p);
 
@@ -146,7 +146,7 @@ public class ProductoService extends ServiceTransaccional {
 	// =========================================================
 	public void eliminarProducto(int idProducto) {
 
-		SecurityManager.validar(Permiso.PRODUCTO_ELIMINAR);
+		SecurityManager.validarPermiso(Permiso.PRODUCTO_ELIMINAR);
 
 		Producto existente = productoDAO.findById(idProducto);
 

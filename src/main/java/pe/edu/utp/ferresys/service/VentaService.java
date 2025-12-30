@@ -36,7 +36,7 @@ public class VentaService extends ServiceTransaccional {
 	// =========================================================
 	public void registrarVenta(Venta venta) {
 
-		SecurityManager.validar(Permiso.VENTA_CREAR);
+		SecurityManager.validarPermiso(Permiso.VENTA_CREAR);
 
 		if (venta == null || venta.getDetalles() == null || venta.getDetalles().isEmpty()) {
 			throw new BusinessException("La venta no tiene detalles");

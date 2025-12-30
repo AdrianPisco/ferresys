@@ -75,7 +75,7 @@ public class UsuarioService extends ServiceTransaccional {
 	// =========================================================
 	public void createUser(String username, String passwordPlano, Rol rol) {
 
-		SecurityManager.validar(Permiso.USUARIO_CREAR);
+		SecurityManager.validarPermiso(Permiso.USUARIO_CREAR);
 		validarUsuarioNoExiste(username);
 
 		Connection conn = abrirTransaccion();
@@ -111,7 +111,7 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public Usuario getUsuarioPorUsername(String username) {
 
-		SecurityManager.validar(Permiso.USUARIO_VER);
+		SecurityManager.validarPermiso(Permiso.USUARIO_VER);
 
 		Usuario usuario = usuarioDAO.findByUsername(username);
 
@@ -124,7 +124,7 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public void desactivarUsuario(String username) {
 
-		SecurityManager.validar(Permiso.USUARIO_EDITAR);
+		SecurityManager.validarPermiso(Permiso.USUARIO_EDITAR);
 
 		Connection conn = abrirTransaccion();
 
@@ -157,7 +157,7 @@ public class UsuarioService extends ServiceTransaccional {
 
 	public void eliminarUsuario(String username) {
 
-		SecurityManager.validar(Permiso.USUARIO_ELIMINAR);
+		SecurityManager.validarPermiso(Permiso.USUARIO_ELIMINAR);
 
 		Connection conn = abrirTransaccion();
 
