@@ -22,14 +22,24 @@ public final class SecurityManager {
 	// =========================================================
 	// CONSULTA: ¿TIENE PERMISO?
 	// =========================================================
+	// =========================================================
+	// CONSULTA: ¿TIENE PERMISO?
+	// =========================================================
 	public static boolean tienePermiso(Permiso permiso) {
 
+		// 1. SI NO HAY SESION ACTIVA, NO HAY PERMISOS
+		if (!UserSession.isLoggedIn()) {
+			return false;
+		}
+
+		// 2. OBTENER USUARIO DE SESION
 		Usuario usuario = UserSession.getUsuarioActual();
 
 		if (usuario == null || usuario.getRol() == null) {
 			return false;
 		}
 
+		// 3. VALIDAR PERMISO SEGUN ROL
 		return RolPermisoConfig.permisosDe(usuario.getRol()).contains(permiso);
 	}
 
