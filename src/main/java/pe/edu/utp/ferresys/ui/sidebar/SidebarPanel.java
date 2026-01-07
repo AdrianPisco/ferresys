@@ -1,6 +1,8 @@
 package pe.edu.utp.ferresys.ui.sidebar;
 
 import java.awt.*;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,8 +14,9 @@ import pe.edu.utp.ferresys.ui.UIFactory;
  SIDEBAR PANEL – FERRESYS
  RESPONSABILIDAD:
     - MOSTRAR MENÚ LATERAL DEL SISTEMA
+    - USAR SidebarButton
+    - MANEJAR ESTADO ACTIVO DE BOTONES
     - EMITIR OPCIÓN SELECCIONADA (MenuOption)
-    - RESPETAR ROL DEL USUARIO
     - NO NAVEGA
     - NO CONOCE MainFrame
 ================================================================================
@@ -25,8 +28,11 @@ public class SidebarPanel extends JPanel {
 	// CALLBACK PARA NOTIFICAR SELECCIÓN DE MENÚ
 	private final Consumer<MenuOption> onMenuSelected;
 
-	// PANEL CONTENEDOR DE BOTONES
+	// CONTENEDOR DE BOTONES
 	private JPanel menuPanel;
+
+	// MAPA PARA CONTROLAR ESTADO ACTIVO
+	private final Map<MenuOption, SidebarButton> botones = new EnumMap<>(MenuOption.class);
 
 	// =========================================================
 	// CONSTRUCTOR
@@ -57,7 +63,7 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// HEADER (TÍTULO / LOGO DEL SISTEMA)
+	// HEADER (TÍTULO DEL SISTEMA)
 	// =========================================================
 	private JComponent construirHeader() {
 		JLabel lblTitulo = new JLabel("FERRESYS");
@@ -82,7 +88,7 @@ public class SidebarPanel extends JPanel {
 		menuPanel.setOpaque(false);
 		menuPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		agregarBotonesSegunRol();
+		agregarBotonesMenu();
 
 		JScrollPane scroll = new JScrollPane(menuPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -110,30 +116,43 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// BOTONES SEGÚN ROL DEL USUARIO
+	// BOTONES DEL MENÚ
 	// =========================================================
-	private void agregarBotonesSegunRol() {
+	private void agregarBotonesMenu() {
 		menuPanel.add(crearBoton(MenuOption.DASHBOARD, "Dashboard"));
 		menuPanel.add(crearBoton(MenuOption.VENTAS, "Ventas"));
 		menuPanel.add(crearBoton(MenuOption.PRODUCTOS, "Productos"));
-
 		menuPanel.add(crearBoton(MenuOption.USUARIOS, "Usuarios"));
 		menuPanel.add(crearBoton(MenuOption.REPORTES, "Reportes"));
+
+		// BOTÓN ACTIVO POR DEFECTO
+		setActivo(MenuOption.DASHBOARD);
 	}
 
 	// =========================================================
-	// FÁBRICA DE BOTONES DEL SIDEBAR
+	// FÁBRICA DE BOTONES
 	// =========================================================
-	private JButton crearBoton(MenuOption option, String texto) {
-		JButton btn = new JButton(texto);
+	private SidebarButton crearBoton(MenuOption option, String texto) {
+		SidebarButton btn = new SidebarButton(texto);
 
 		btn.setAlignmentX(Component.LEFT_ALIGNMENT);
 		btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
 
-		UIFactory.estilizarSidebarButton(btn);
+		btn.addActionListener(e -> {
+			setActivo(option);
+			onMenuSelected.accept(option);
+		});
 
-		btn.addActionListener(e -> onMenuSelected.accept(option));
+		botones.put(option, btn);
+		menuPanel.add(btn);
 
 		return btn;
+	}
+
+	// =========================================================
+	// ACTIVA UN BOTÓN Y DESACTIVA LOS DEMÁS
+	// =========================================================
+	private void setActivo(MenuOption option) {
+		botones.forEach((op, btn) -> btn.setActivo(op == option));
 	}
 }
