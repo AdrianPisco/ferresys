@@ -3,7 +3,9 @@ package pe.edu.utp.ferresys.ui.sidebar;
 import java.awt.*;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -17,6 +19,7 @@ import pe.edu.utp.ferresys.ui.UIFactory;
     - USAR SidebarButton
     - MANEJAR ESTADO ACTIVO DE BOTONES
     - EMITIR OPCIÓN SELECCIONADA (MenuOption)
+ REGLAS:
     - NO NAVEGA
     - NO CONOCE MainFrame
 ================================================================================
@@ -25,27 +28,35 @@ public class SidebarPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	// CALLBACK PARA NOTIFICAR SELECCIÓN DE MENÚ
+	// =========================================================
+	// CALLBACK (EVENTO DE SELECCIÓN)
+	// =========================================================
 	private final Consumer<MenuOption> onMenuSelected;
 
-	// CONTENEDOR DE BOTONES
+	// =========================================================
+	// UI
+	// =========================================================
 	private JPanel menuPanel;
 
-	// MAPA PARA CONTROLAR ESTADO ACTIVO
+	// =========================================================
+	// CONTROL DE ESTADO ACTIVO
+	// =========================================================
 	private final Map<MenuOption, SidebarButton> botones = new EnumMap<>(MenuOption.class);
 
 	// =========================================================
 	// CONSTRUCTOR
 	// =========================================================
 	public SidebarPanel(Consumer<MenuOption> onMenuSelected) {
-		this.onMenuSelected = onMenuSelected;
+
+		// Defensa: el Sidebar no puede existir sin callback
+		this.onMenuSelected = Objects.requireNonNull(onMenuSelected, "SidebarPanel requiere un Consumer<MenuOption>");
 
 		configurarPanel();
 		construirUI();
 	}
 
 	// =========================================================
-	// CONFIGURACIÓN BASE DEL PANEL
+	// CONFIGURACIÓN BASE
 	// =========================================================
 	private void configurarPanel() {
 		setLayout(new BorderLayout());
@@ -54,7 +65,7 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// CONSTRUCCIÓN GENERAL DE LA UI
+	// CONSTRUCCIÓN GENERAL
 	// =========================================================
 	private void construirUI() {
 		add(construirHeader(), BorderLayout.NORTH);
@@ -63,9 +74,10 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// HEADER (TÍTULO DEL SISTEMA)
+	// HEADER
 	// =========================================================
 	private JComponent construirHeader() {
+
 		JLabel lblTitulo = new JLabel("FERRESYS");
 		lblTitulo.setFont(UIFactory.fontBold(18));
 		lblTitulo.setForeground(UIFactory.sidebarTextPrimary());
@@ -83,6 +95,7 @@ public class SidebarPanel extends JPanel {
 	// MENÚ CENTRAL
 	// =========================================================
 	private JComponent construirMenu() {
+
 		menuPanel = new JPanel();
 		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
 		menuPanel.setOpaque(false);
@@ -92,17 +105,19 @@ public class SidebarPanel extends JPanel {
 
 		JScrollPane scroll = new JScrollPane(menuPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
 		scroll.setBorder(null);
-		scroll.getViewport().setOpaque(false);
 		scroll.setOpaque(false);
+		scroll.getViewport().setOpaque(false);
 
 		return scroll;
 	}
 
 	// =========================================================
-	// FOOTER (CONFIGURACIÓN / LOGOUT)
+	// FOOTER
 	// =========================================================
 	private JComponent construirFooter() {
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setOpaque(false);
@@ -116,16 +131,16 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// BOTONES DEL MENÚ
+	// BOTONES PRINCIPALES
 	// =========================================================
 	private void agregarBotonesMenu() {
-		menuPanel.add(crearBoton(MenuOption.DASHBOARD, "Dashboard"));
-		menuPanel.add(crearBoton(MenuOption.VENTAS, "Ventas"));
-		menuPanel.add(crearBoton(MenuOption.PRODUCTOS, "Productos"));
-		menuPanel.add(crearBoton(MenuOption.USUARIOS, "Usuarios"));
-		menuPanel.add(crearBoton(MenuOption.REPORTES, "Reportes"));
 
-		// BOTÓN ACTIVO POR DEFECTO
+		crearBoton(MenuOption.DASHBOARD, "Dashboard");
+		crearBoton(MenuOption.VENTAS, "Ventas");
+		crearBoton(MenuOption.PRODUCTOS, "Productos");
+		crearBoton(MenuOption.USUARIOS, "Usuarios");
+		crearBoton(MenuOption.REPORTES, "Reportes");
+
 		setActivo(MenuOption.DASHBOARD);
 	}
 
@@ -133,6 +148,7 @@ public class SidebarPanel extends JPanel {
 	// FÁBRICA DE BOTONES
 	// =========================================================
 	private SidebarButton crearBoton(MenuOption option, String texto) {
+
 		SidebarButton btn = new SidebarButton(texto);
 
 		btn.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -150,7 +166,7 @@ public class SidebarPanel extends JPanel {
 	}
 
 	// =========================================================
-	// ACTIVA UN BOTÓN Y DESACTIVA LOS DEMÁS
+	// MANEJO DE ESTADO ACTIVO
 	// =========================================================
 	private void setActivo(MenuOption option) {
 		botones.forEach((op, btn) -> btn.setActivo(op == option));
